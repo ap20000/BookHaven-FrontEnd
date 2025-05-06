@@ -62,7 +62,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       _isLoading = false;
     });
 
-    // Show success message and navigate back to login
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Password reset successful!'),
@@ -133,7 +132,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                         const SizedBox(height: 40),
 
-                        // Email Field (shown only in first step)
+                        // Email Field (shown only in 1st step)
                         if (_currentStep == 0)
                           TextFormField(
                             controller: _emailController,
@@ -189,7 +188,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             },
                           ),
 
-                        // Password fields (shown only in second step)
+                        // Password fields (shown only in 2nd step)
                         if (_currentStep == 1) ...[
                           TextFormField(
                             controller: _passwordController,

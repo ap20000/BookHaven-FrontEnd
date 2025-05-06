@@ -1,3 +1,4 @@
+import 'package:book_frontend/api/auth_service.dart'; // Import your AuthService
 import 'package:book_frontend/screens/forget_password_page.dart';
 import 'package:book_frontend/screens/register_page.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,9 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
+  // Instantiate the AuthService to call the API
+  final AuthService _authService = AuthService();
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -32,20 +36,45 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    // Simulating authentication delay
-    await Future.delayed(const Duration(seconds: 2));
+    final email = _emailController.text;
+    final password = _passwordController.text;
 
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      final response = await _authService.login(email, password);
 
-    // if (response.user != null) {
-    //   if (mounted) {
-    //     Navigator.of(context).pushReplacement(
-    //       MaterialPageRoute(builder: (context) => const AccountPage()),
-    //     );
-    //   }
-    // }
+      if (response['token'] != null) {
+        print('Login successful: ${response['token']}');
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorDialog('Invalid credentials.');
+      }
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog('An error occurred: $error');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -208,32 +237,23 @@ class _LoginPageState extends State<LoginPage> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // Implement forgot password functionality
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                            ),
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => const ForgotPasswordPage(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                "Forget password?",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => const ForgotPasswordPage(),
                                 ),
+                              );
+                            },
+                            child: const Text(
+                              'Forgot password?',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: _isLoading ? null : _signIn,
@@ -248,13 +268,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child:
                               _isLoading
-                                  ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
+                                  ? const CircularProgressIndicator(
+                                    color: Colors.white,
                                   )
                                   : const Text(
                                     'SIGN IN',
@@ -269,23 +284,16 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              "Don't have an account?",
-                              style: TextStyle(
-                                color: Colors.black.withOpacity(0.7),
-                              ),
-                            ),
+                            const Text("Don't have an account?"),
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).push(
+                                Navigator.push(
+                                  context,
                                   MaterialPageRoute(
                                     builder: (context) => const RegisterPage(),
                                   ),
                                 );
                               },
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.black,
-                              ),
                               child: const Text(
                                 'Register',
                                 style: TextStyle(
