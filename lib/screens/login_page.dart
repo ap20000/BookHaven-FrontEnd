@@ -1,5 +1,4 @@
-import 'package:book_frontend/api/auth_service.dart'; // Import your AuthService
-import 'package:book_frontend/screens/forget_password_page.dart';
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:book_frontend/screens/register_page.dart';
 import 'package:flutter/material.dart';
 
@@ -42,9 +41,16 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final response = await _authService.login(email, password);
 
-      if (response['token'] != null) {
-        print('Login successful: ${response['token']}');
-        Navigator.pushReplacementNamed(context, '/home');
+      if (response.containsKey('userID') && response.containsKey('role')) {
+        String role = response['role'];
+
+        if (role == 'admin') {
+          // Navigate to the Publisher page if the user is an admin
+          Navigator.pushReplacementNamed(context, '/publisher');
+        } else {
+          // Navigate to the Home page for regular users
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       } else {
         setState(() {
           _isLoading = false;
@@ -64,8 +70,8 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Error'),
-          content: Text(message),
+          title: Text('Failed to login'),
+          content: Text("Invalid credentials or server error."),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -233,27 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => const ForgotPasswordPage(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              'Forgot password?',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
+
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: _isLoading ? null : _signIn,
@@ -290,7 +276,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
+                                    builder: (context) => RegisterPage(),
                                   ),
                                 );
                               },

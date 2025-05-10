@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const String API_URL = 'http://localhost:5062/api/user/';
+const String API_URL =
+    'http://localhost:5062/api/user/'; // Ensure this is correct
 
 class AuthService {
   Future<Map<String, dynamic>> login(String email, String password) async {
@@ -15,7 +16,9 @@ class AuthService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to login: ${response.reasonPhrase}');
+        throw Exception(
+          'Failed to login: ${response.reasonPhrase}, Response Body: ${response.body}',
+        );
       }
     } catch (error) {
       throw Exception('Error: $error');
@@ -25,9 +28,9 @@ class AuthService {
   Future<Map<String, dynamic>> register(
     String name,
     String email,
-    String password,
-    String role,
-  ) async {
+    String password, {
+    String role = 'user', // Default role is 'user'
+  }) async {
     try {
       final response = await http.post(
         Uri.parse(API_URL + 'register'),
@@ -43,29 +46,14 @@ class AuthService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to register: ${response.reasonPhrase}');
-      }
-    } catch (error) {
-      throw Exception('Error: $error');
-    }
-  }
-
-  Future<Map<String, dynamic>> forgotPassword(String email) async {
-    try {
-      final response = await http.post(
-        Uri.parse(API_URL + 'forgot-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email}),
-      );
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
+        print('Registration failed: ${response.statusCode}');
+        print('Response Body: ${response.body}'); // Debugging
         throw Exception(
-          'Failed to send password reset link: ${response.reasonPhrase}',
+          'Failed to register: ${response.reasonPhrase}, Response Body: ${response.body}',
         );
       }
     } catch (error) {
+      print('Error during registration: $error');
       throw Exception('Error: $error');
     }
   }
