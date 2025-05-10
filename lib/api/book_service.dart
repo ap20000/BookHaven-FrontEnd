@@ -46,6 +46,17 @@ class BookService {
     }
   }
 
+  Future<Book> getBookById(int id) async {
+    final response = await http.get(Uri.parse(baseUrl + '$id'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return Book.fromJson(data);
+    } else {
+      throw Exception('Failed to fetch book with id $id');
+    }
+  }
+
   //   // Search books
   //   Future<List<dynamic>> searchBooks(String query) async {
   //     try {

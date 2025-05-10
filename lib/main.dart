@@ -1,3 +1,4 @@
+import 'package:book_frontend/screens/admin/publisher_page.dart';
 import 'package:book_frontend/screens/catalog_page.dart';
 import 'package:book_frontend/screens/home_page.dart';
 import 'package:book_frontend/screens/login_page.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => RegisterPage(),
         '/catalog': (context) => const CatalogPage(),
+        '/publisher': (context) => PublisherPage(),
       },
     );
   }
