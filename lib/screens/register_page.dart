@@ -1,3 +1,4 @@
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:book_frontend/screens/login_page.dart';
 import 'package:flutter/material.dart';
 
@@ -33,19 +34,92 @@ class _RegisterPageState extends State<RegisterPage> {
       _isLoading = true;
     });
 
-    // Simulating registration delay
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final response = await AuthService().register(
+        _nameController.text,
+        _emailController.text,
+        _passwordController.text,
+      );
 
-    setState(() {
-      _isLoading = false;
-    });
+      print('Registration response: $response');
+
+      if (response.containsKey('userID')) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Registration Successful'),
+              content: const Text(
+                'You have successfully registered. Please log in.',
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else if (response.containsKey('error')) {
+        // Show error dialog if email already exists or other backend error
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Registration Failed'),
+              content: Text(response['error'].toString()),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        throw Exception('Unexpected error during registration');
+      }
+    } catch (error) {
+      print('Error during registration: $error');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Registration Error'),
+            content: Text(error.toString()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // No AppBar to avoid back button
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -245,6 +319,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             }
                             if (value.length < 6) {
                               return 'Password must be at least 6 characters';
+                            }
+                            if (!RegExp(r'^[a-zA-Z0-9@]+$').hasMatch(value)) {
+                              return 'Only @ is allowed as a special character';
+                            }
+                            if (!RegExp(
+                              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)',
+                            ).hasMatch(value)) {
+                              return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
                             }
                             return null;
                           },

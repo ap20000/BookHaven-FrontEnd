@@ -42,8 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final response = await _authService.login(email, password);
 
-      if (response['token'] != null) {
-        print('Login successful: ${response['token']}');
+      if (response.containsKey('userID')) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         setState(() {
@@ -64,8 +63,8 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Error'),
-          content: Text(message),
+          title: Text('Failed to login'),
+          content: Text("Invalid credentials or server error."),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -233,27 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => const ForgotPasswordPage(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              'Forgot password?',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
+
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: _isLoading ? null : _signIn,
@@ -290,7 +269,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
+                                    builder: (context) => RegisterPage(),
                                   ),
                                 );
                               },

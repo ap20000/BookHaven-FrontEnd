@@ -1,4 +1,4 @@
-import 'package:book_frontend/screens/forget_password_page.dart';
+import 'package:book_frontend/screens/catalog_page.dart';
 import 'package:book_frontend/screens/home_page.dart';
 import 'package:book_frontend/screens/login_page.dart';
 import 'package:book_frontend/screens/register_page.dart';
@@ -17,10 +17,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
-        '/home': (context) => const HomePage(),
+        '/home': (context) => HomePage(),
         '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/forgotPassword': (context) => const ForgotPasswordPage(),
+        '/register': (context) => RegisterPage(),
+        '/catalog': (context) => const CatalogPage(),
       },
     );
   }
