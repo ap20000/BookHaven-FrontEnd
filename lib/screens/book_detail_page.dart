@@ -1,6 +1,8 @@
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:book_frontend/model/book.dart';
 import 'package:book_frontend/api/book_service.dart';
+import 'package:book_frontend/api/cart_service.dart';
 
 class BookDetailPage extends StatefulWidget {
   final int bookId;
@@ -52,6 +54,31 @@ class _BookDetailPageState extends State<BookDetailPage> {
       _isBookmarked = !_isBookmarked;
     });
     // In a real app, you would save this state to a database or local storage
+  }
+
+  Future<void> _addToCart(int bookId) async {
+    try {
+      final authService = AuthService();
+      final userId = await authService.getUserId();
+
+      if (userId == null) {
+        throw Exception('User ID not found. Please log in again.');
+      }
+
+      final cartService = CartService();
+      await cartService.addToCart(userId, bookId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Book added to cart'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   void _navigateToAddReview() {
@@ -225,7 +252,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
                               // Add to Cart button
                               Expanded(
                                 child: ElevatedButton(
-                                  onPressed: isInStock ? () {} : null,
+                                  onPressed:
+                                      isInStock
+                                          ? () => _addToCart(book.bookID)
+                                          : null,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                         isInStock
