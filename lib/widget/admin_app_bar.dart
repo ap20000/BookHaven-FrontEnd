@@ -5,6 +5,8 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onPublishersPressed;
   final VoidCallback? onAnnouncementsPressed;
   final VoidCallback? onDiscountsPressed;
+  final VoidCallback? onGenresPressed;
+  final VoidCallback? onAuthorsPressed;
   final String? activeRoute;
 
   const AdminAppBar({
@@ -13,6 +15,8 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onPublishersPressed,
     this.onAnnouncementsPressed,
     this.onDiscountsPressed,
+    this.onGenresPressed,
+    this.onAuthorsPressed,
     this.activeRoute,
   });
 
@@ -50,6 +54,8 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
             onAnnouncementsPressed,
           ),
           _buildNavButton('discounts', 'Discounts', onDiscountsPressed),
+          _buildNavButton('genres', 'Genres', onGenresPressed),
+          _buildNavButton('authors', 'Authors', onAuthorsPressed),
         ],
       ),
     );

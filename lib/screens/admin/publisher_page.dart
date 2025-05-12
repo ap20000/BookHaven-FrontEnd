@@ -122,13 +122,13 @@ class _PublisherPageState extends State<PublisherPage> {
       backgroundColor: Colors.white,
       appBar: AdminAppBar(
         activeRoute: 'publishers',
-        onBooksPressed: () => Navigator.pushNamed(context, '/admin/books'),
-        onPublishersPressed:
-            () => Navigator.pushNamed(context, '/admin/publishers'),
+        onBooksPressed: () => Navigator.pushNamed(context, '/books'),
+        onPublishersPressed: () => Navigator.pushNamed(context, '/publishers'),
         onAnnouncementsPressed:
-            () => Navigator.pushNamed(context, '/admin/announcements'),
-        onDiscountsPressed:
-            () => Navigator.pushNamed(context, '/admin/discounts'),
+            () => Navigator.pushNamed(context, '/announcements'),
+        onDiscountsPressed: () => Navigator.pushNamed(context, '/discounts'),
+        onGenresPressed: () => Navigator.pushNamed(context, '/genres'),
+        onAuthorsPressed: () => Navigator.pushNamed(context, '/authors'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),

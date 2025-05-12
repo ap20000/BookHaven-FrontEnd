@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (role == 'admin') {
           // Navigate to the Publisher page if the user is an admin
-          Navigator.pushReplacementNamed(context, '/publisher');
+          Navigator.pushReplacementNamed(context, '/publishers');
         } else {
           // Navigate to the Home page for regular users
           Navigator.pushReplacementNamed(context, '/home');
