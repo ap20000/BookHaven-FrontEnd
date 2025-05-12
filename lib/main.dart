@@ -1,3 +1,4 @@
+import 'package:book_frontend/screens/admin/announcement_management_page.dart';
 import 'package:book_frontend/screens/admin/author_management_page.dart';
 import 'package:book_frontend/screens/admin/book_management_page.dart';
 import 'package:book_frontend/screens/admin/genre_management_page.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/authors': (context) => const AuthorManagementPage(),
         '/orders-list': (context) => const UserOrdersPage(),
         '/claim-process': (context) => const ClaimProcessPage(),
+        '/announcements': (context) => const AnnouncementManagementPage(),
       },
     );
   }
