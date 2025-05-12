@@ -53,7 +53,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
     setState(() {
       _isBookmarked = !_isBookmarked;
     });
-    // In a real app, you would save this state to a database or local storage
   }
 
   Future<void> _addToCart(int bookId) async {
@@ -82,7 +81,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   void _navigateToAddReview() {
-    // In a real app, this would navigate to a review form
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Navigate to Add Review page'),

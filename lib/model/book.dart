@@ -1,3 +1,6 @@
+import 'package:book_frontend/model/author.dart';
+import 'package:book_frontend/model/genre.dart';
+
 class Book {
   final int bookID;
   final String title;
@@ -12,6 +15,8 @@ class Book {
   final int publisherID;
   final DateTime? saleStartDate;
   final DateTime? saleEndDate;
+  final List<Author> authors;
+  final List<Genre> genres;
 
   Book({
     required this.bookID,
@@ -27,6 +32,8 @@ class Book {
     required this.publisherID,
     this.saleStartDate,
     this.saleEndDate,
+    required this.authors,
+    required this.genres,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -83,6 +90,10 @@ class Book {
               : null,
       saleEndDate:
           json['saleEndDate'] != null ? parseDate(json['saleEndDate']) : null,
+
+      authors:
+          (json['authors'] as List).map((a) => Author.fromJson(a)).toList(),
+      genres: (json['genres'] as List).map((g) => Genre.fromJson(g)).toList(),
     );
   }
 
