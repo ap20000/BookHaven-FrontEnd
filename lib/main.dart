@@ -2,10 +2,12 @@ import 'package:book_frontend/screens/admin/author_management_page.dart';
 import 'package:book_frontend/screens/admin/book_management_page.dart';
 import 'package:book_frontend/screens/admin/genre_management_page.dart';
 import 'package:book_frontend/screens/admin/publisher_page.dart';
+import 'package:book_frontend/screens/cart_item_screen.dart';
 import 'package:book_frontend/screens/catalog_page.dart';
 import 'package:book_frontend/screens/home_page.dart';
 import 'package:book_frontend/screens/login_page.dart';
 import 'package:book_frontend/screens/register_page.dart';
+import 'package:book_frontend/screens/user_order_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -25,10 +27,12 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => RegisterPage(),
         '/catalog': (context) => const CatalogPage(),
+        '/cart': (context) => const CartPage(),
         '/books': (context) => BookManagementPage(),
         '/publishers': (context) => const PublisherPage(),
         '/genres': (context) => const GenreManagementPage(),
         '/authors': (context) => const AuthorManagementPage(),
+        '/orders-list': (context) => const UserOrdersPage(),
       },
     );
   }
