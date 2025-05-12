@@ -28,7 +28,7 @@ class BookService {
   }
 
   Future<void> deleteBook(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/$id'));
+    final response = await http.delete(Uri.parse('$baseUrl$id'));
     if (response.statusCode != 200) {
       throw Exception('Failed to delete book: ${response.body}');
     }
@@ -36,7 +36,7 @@ class BookService {
 
   Future<void> updateBook(int id, Map<String, dynamic> bookData) async {
     final response = await http.put(
-      Uri.parse('$baseUrl/$id'),
+      Uri.parse('$baseUrl$id'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(bookData),
     );

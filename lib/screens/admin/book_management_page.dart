@@ -36,13 +36,13 @@ class _BookManagementPageState extends State<BookManagementPage>
 
   // Form state
   int? _publisherID;
-  String _applicationUserId = "6f931d04-d44e-4fa7-84cb-9b4475a7c78c";
+  final String _applicationUserId = "6f931d04-d44e-4fa7-84cb-9b4475a7c78c";
   bool _isOnSale = false;
   DateTime? _publicationDate;
   DateTime? _saleStartDate;
   DateTime? _saleEndDate;
-  List<int> _selectedGenreIDs = [];
-  List<int> _selectedAuthorIDs = [];
+  List<Object> _selectedGenreIDs = [];
+  List<Object> _selectedAuthorIDs = [];
   int? _editingBookId;
 
   // Data lists
@@ -55,6 +55,7 @@ class _BookManagementPageState extends State<BookManagementPage>
   bool _isLoading = false;
   bool _isSubmitting = false;
   bool _isLoadingBooks = false;
+  bool _isLoadingBookDetails = false;
   late TabController _tabController;
   String _searchQuery = '';
 
@@ -78,6 +79,7 @@ class _BookManagementPageState extends State<BookManagementPage>
     super.dispose();
   }
 
+  // Fetch reference data (genres, authors, publishers)
   Future<void> _fetchData() async {
     setState(() {
       _isLoading = true;
@@ -119,6 +121,7 @@ class _BookManagementPageState extends State<BookManagementPage>
     }
   }
 
+  // Fetch all books
   Future<void> _fetchBooks() async {
     setState(() {
       _isLoadingBooks = true;
@@ -146,6 +149,7 @@ class _BookManagementPageState extends State<BookManagementPage>
     }
   }
 
+  // Date picker helper
   Future<void> _selectDate(
     BuildContext context,
     DateTime? initialDate,
@@ -173,6 +177,7 @@ class _BookManagementPageState extends State<BookManagementPage>
     if (picked != null) onDateSelected(picked);
   }
 
+  // Reset form to initial state
   void _resetForm() {
     _titleController.clear();
     _isbnController.clear();
@@ -194,6 +199,7 @@ class _BookManagementPageState extends State<BookManagementPage>
     });
   }
 
+  // Submit book (add or update)
   Future<void> _submitBook() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -236,6 +242,34 @@ class _BookManagementPageState extends State<BookManagementPage>
         ),
       );
       return;
+    }
+
+    // Show confirmation dialog for updates
+    if (_editingBookId != null) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Confirm Update'),
+              content: const Text('Are you sure you want to update this book?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(foregroundColor: Colors.black),
+                  child: const Text('Update'),
+                ),
+              ],
+            ),
+      );
+
+      if (confirmed != true) return;
     }
 
     setState(() {
@@ -317,6 +351,7 @@ class _BookManagementPageState extends State<BookManagementPage>
     }
   }
 
+  // Delete a book
   Future<void> _deleteBook(Book book) async {
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
@@ -368,34 +403,79 @@ class _BookManagementPageState extends State<BookManagementPage>
     }
   }
 
-  // void _editBook(Book book) {
-  //   // Populate form with book data
-  //   _titleController.text = book.title;
-  //   _isbnController.text = book.isbn;
-  //   _descController.text = book.description;
-  //   _priceController.text = book.price.toString();
-  //   _stockController.text = book.stock.toString();
-  //   _languageController.text = book.language;
-  //   _formatController.text = book.format;
+  // Edit a book
+  Future<void> _editBook(Book book) async {
+    setState(() {
+      _isLoadingBookDetails = true;
+    });
 
-  //   setState(() {
-  //     _editingBookId = book.bookID;
-  //     _publisherID = book.publisherID;
-  //     _isOnSale = book.isOnSale;
-  //     _publicationDate = book.publicationDate;
-  //     _saleStartDate = book.saleStartDate;
-  //     _saleEndDate = book.saleEndDate;
+    try {
+      // Fetch book details including genres and authors
+      final bookDetails = await _bookService.getBookById(book.bookID);
 
-  //     // TODO: In a real app, you would fetch the book's genres and authors
-  //     // For now, we'll just reset these
-  //     _selectedGenreIDs = [];
-  //     _selectedAuthorIDs = [];
-  //   });
+      // Populate form with book data
+      _titleController.text = book.title;
+      _isbnController.text = book.isbn;
+      _descController.text = book.description;
+      _priceController.text = book.price.toString();
+      _stockController.text = book.stock.toString();
+      _languageController.text = book.language;
+      _formatController.text = book.format;
 
-  //   // Switch to form tab
-  //   _tabController.animateTo(0);
-  // }
+      setState(() {
+        _editingBookId = book.bookID;
+        _publisherID = book.publisherID;
+        _isOnSale = book.isOnSale;
+        _publicationDate = book.publicationDate;
+        _saleStartDate = book.saleStartDate;
+        _saleEndDate = book.saleEndDate;
 
+        _selectedGenreIDs =
+            bookDetails.genres
+                .map<int>(
+                  (genre) => genre is Genre ? genre.genreID : (genre as int),
+                )
+                .toList();
+        _selectedAuthorIDs =
+            bookDetails.authors
+                .map<int>(
+                  (author) =>
+                      author is Author ? author.authorID : (author as int),
+                )
+                .toList();
+
+        _isLoadingBookDetails = false;
+      });
+
+      // Switch to form tab
+      _tabController.animateTo(0);
+
+      // Scroll to the top of the form
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_formKey.currentContext != null) {
+          Scrollable.ensureVisible(
+            _formKey.currentContext!,
+            duration: const Duration(milliseconds: 300),
+          );
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingBookDetails = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading book details: $e'),
+            backgroundColor: Colors.red[800],
+          ),
+        );
+      }
+    }
+  }
+
+  // Filter books based on search query
   List<Book> get _filteredBooks {
     if (_searchQuery.isEmpty) return _books;
 
@@ -425,7 +505,17 @@ class _BookManagementPageState extends State<BookManagementPage>
       body:
           _isLoading
               ? const Center(
-                child: CircularProgressIndicator(color: Colors.black),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.black),
+                    SizedBox(height: 16),
+                    Text(
+                      'Loading data...',
+                      style: TextStyle(color: Colors.black54, fontSize: 16),
+                    ),
+                  ],
+                ),
               )
               : Column(
                 children: [
@@ -485,7 +575,26 @@ class _BookManagementPageState extends State<BookManagementPage>
                       controller: _tabController,
                       children: [
                         // Add/Edit Book Form
-                        _buildBookForm(),
+                        _isLoadingBookDetails
+                            ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Loading book details...',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            : _buildBookForm(),
 
                         // Book List
                         _buildBookList(),
@@ -577,6 +686,7 @@ class _BookManagementPageState extends State<BookManagementPage>
                       if (value == null || value.trim().isEmpty) {
                         return 'ISBN is required';
                       }
+
                       return null;
                     },
                   ),
@@ -753,6 +863,9 @@ class _BookManagementPageState extends State<BookManagementPage>
                             if (double.tryParse(value) == null) {
                               return 'Please enter a valid number';
                             }
+                            if (double.parse(value) < 0) {
+                              return 'Price cannot be negative';
+                            }
                             return null;
                           },
                         ),
@@ -775,6 +888,9 @@ class _BookManagementPageState extends State<BookManagementPage>
                             }
                             if (int.tryParse(value) == null) {
                               return 'Please enter a valid number';
+                            }
+                            if (int.parse(value) < 0) {
+                              return 'Stock cannot be negative';
                             }
                             return null;
                           },
@@ -1055,18 +1171,62 @@ class _BookManagementPageState extends State<BookManagementPage>
           child:
               _isLoadingBooks
                   ? const Center(
-                    child: CircularProgressIndicator(color: Colors.black),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: Colors.black),
+                        SizedBox(height: 16),
+                        Text(
+                          'Loading books...',
+                          style: TextStyle(color: Colors.black54, fontSize: 16),
+                        ),
+                      ],
+                    ),
                   )
                   : _filteredBooks.isEmpty
-                  ? const Center(child: Text('No books found'))
-                  : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: _filteredBooks.length,
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final book = _filteredBooks[index];
-                      return _buildBookCard(book);
-                    },
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.menu_book_outlined,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No books found',
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (_searchQuery.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Try a different search term',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  )
+                  : RefreshIndicator(
+                    onRefresh: _fetchBooks,
+                    color: Colors.black,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      itemCount: _filteredBooks.length,
+                      separatorBuilder: (context, index) => const Divider(),
+                      itemBuilder: (context, index) {
+                        final book = _filteredBooks[index];
+                        return _buildBookCard(book);
+                      },
+                    ),
                   ),
         ),
       ],
@@ -1227,7 +1387,7 @@ class _BookManagementPageState extends State<BookManagementPage>
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit_outlined),
-                      onPressed: () => {},
+                      onPressed: () => _editBook(book),
                       tooltip: 'Edit',
                       color: Colors.black54,
                     ),
