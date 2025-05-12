@@ -45,10 +45,10 @@ class _LoginPageState extends State<LoginPage> {
         String role = response['role'];
 
         if (role == 'admin') {
-          // Navigate to the Publisher page if the user is an admin
           Navigator.pushReplacementNamed(context, '/publishers');
+        } else if (role == 'staff') {
+          Navigator.pushReplacementNamed(context, '/claim-process');
         } else {
-          // Navigate to the Home page for regular users
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {

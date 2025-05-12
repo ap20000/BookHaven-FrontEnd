@@ -4,6 +4,7 @@ import 'package:book_frontend/screens/admin/genre_management_page.dart';
 import 'package:book_frontend/screens/admin/publisher_page.dart';
 import 'package:book_frontend/screens/cart_item_screen.dart';
 import 'package:book_frontend/screens/catalog_page.dart';
+import 'package:book_frontend/screens/staff/claim_process_page.dart';
 import 'package:book_frontend/screens/home_page.dart';
 import 'package:book_frontend/screens/login_page.dart';
 import 'package:book_frontend/screens/register_page.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/genres': (context) => const GenreManagementPage(),
         '/authors': (context) => const AuthorManagementPage(),
         '/orders-list': (context) => const UserOrdersPage(),
+        '/claim-process': (context) => const ClaimProcessPage(),
       },
     );
   }

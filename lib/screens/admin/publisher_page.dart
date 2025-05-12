@@ -1,3 +1,4 @@
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:book_frontend/widget/admin_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:book_frontend/api/publisher_service.dart';
@@ -129,6 +130,12 @@ class _PublisherPageState extends State<PublisherPage> {
         onDiscountsPressed: () => Navigator.pushNamed(context, '/discounts'),
         onGenresPressed: () => Navigator.pushNamed(context, '/genres'),
         onAuthorsPressed: () => Navigator.pushNamed(context, '/authors'),
+        onLogoutPressed:
+            () => () async {
+              final auth = AuthService();
+              await auth.logout();
+              Navigator.pushReplacementNamed(context, '/login');
+            },
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),

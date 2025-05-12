@@ -1,3 +1,4 @@
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:book_frontend/api/order_service.dart';
 import 'package:book_frontend/model/cart_item.dart';
 import 'package:book_frontend/widget/custom_app_bar.dart';
@@ -31,6 +32,11 @@ class _CartPageState extends State<CartPage> {
         onCatalogPressed: () => Navigator.pushNamed(context, '/catalog'),
         onBookmarkPressed: () => Navigator.pushNamed(context, '/bookmarks'),
         onCartPressed: () => Navigator.pushNamed(context, '/cart'),
+        onLogoutPressed: () async {
+          final auth = AuthService();
+          await auth.logout();
+          Navigator.pushReplacementNamed(context, '/login');
+        },
       ),
       body: FutureBuilder<List<CartItem>>(
         future: _cartFuture,

@@ -76,4 +76,10 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userId');
   }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('userId');
+  }
 }

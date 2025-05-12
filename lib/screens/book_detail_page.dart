@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:book_frontend/model/book.dart';
 import 'package:book_frontend/api/book_service.dart';
 import 'package:book_frontend/api/cart_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BookDetailPage extends StatefulWidget {
   final int bookId;

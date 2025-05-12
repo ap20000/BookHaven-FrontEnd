@@ -7,6 +7,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onDiscountsPressed;
   final VoidCallback? onGenresPressed;
   final VoidCallback? onAuthorsPressed;
+  final VoidCallback? onLogoutPressed;
   final String? activeRoute;
 
   const AdminAppBar({
@@ -17,6 +18,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onDiscountsPressed,
     this.onGenresPressed,
     this.onAuthorsPressed,
+    this.onLogoutPressed,
     this.activeRoute,
   });
 
@@ -56,6 +58,19 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
           _buildNavButton('discounts', 'Discounts', onDiscountsPressed),
           _buildNavButton('genres', 'Genres', onGenresPressed),
           _buildNavButton('authors', 'Authors', onAuthorsPressed),
+          const Spacer(),
+          ElevatedButton(
+            onPressed: onLogoutPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: const Text('Logout'),
+          ),
         ],
       ),
     );

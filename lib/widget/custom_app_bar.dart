@@ -8,6 +8,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onCartPressed;
   final VoidCallback? onLoginPressed;
   final VoidCallback? onRegisterPressed;
+  final VoidCallback? onLogoutPressed;
   final String? activeRoute;
 
   const CustomAppBar({
@@ -19,12 +20,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onCartPressed,
     this.onLoginPressed,
     this.onRegisterPressed,
+    this.onLogoutPressed,
     this.activeRoute,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Default AppBar layout
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
       decoration: BoxDecoration(
@@ -54,7 +55,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           _buildNavButton('bookmark', 'Bookmark', onBookmarkPressed),
           const Spacer(),
           if (isLoggedIn)
-            _buildIconButton(Icons.shopping_cart_outlined, onCartPressed)
+            Row(
+              children: [
+                _buildIconButton(Icons.shopping_cart_outlined, onCartPressed),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: onLogoutPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  child: const Text("Logout"),
+                ),
+              ],
+            )
           else
             Row(
               children: [
