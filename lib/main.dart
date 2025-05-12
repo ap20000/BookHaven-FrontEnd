@@ -1,3 +1,6 @@
+import 'package:book_frontend/screens/admin/author_management_page.dart';
+import 'package:book_frontend/screens/admin/book_management_page.dart';
+import 'package:book_frontend/screens/admin/genre_management_page.dart';
 import 'package:book_frontend/screens/admin/publisher_page.dart';
 import 'package:book_frontend/screens/catalog_page.dart';
 import 'package:book_frontend/screens/home_page.dart';
@@ -22,7 +25,10 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => RegisterPage(),
         '/catalog': (context) => const CatalogPage(),
-        '/publisher': (context) => PublisherPage(),
+        '/books': (context) => BookManagementPage(),
+        '/publishers': (context) => const PublisherPage(),
+        '/genres': (context) => const GenreManagementPage(),
+        '/authors': (context) => const AuthorManagementPage(),
       },
     );
   }
