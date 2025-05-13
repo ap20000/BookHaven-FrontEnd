@@ -1,3 +1,4 @@
+import 'package:book_frontend/screens/add_review_page.dart';
 import 'package:book_frontend/screens/admin/author_management_page.dart';
 import 'package:book_frontend/screens/admin/book_management_page.dart';
 import 'package:book_frontend/screens/admin/genre_management_page.dart';

@@ -1,4 +1,5 @@
 import 'package:book_frontend/api/auth_service.dart';
+import 'package:book_frontend/screens/add_review_page.dart';
 import 'package:flutter/material.dart';
 import 'package:book_frontend/model/book.dart';
 import 'package:book_frontend/api/book_service.dart';
@@ -82,11 +83,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   void _navigateToAddReview() {
-    // In a real app, this would navigate to a review form
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Navigate to Add Review page'),
-        duration: Duration(seconds: 2),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddReviewPage(bookId: widget.bookId),
       ),
     );
   }
