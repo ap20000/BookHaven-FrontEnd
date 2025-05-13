@@ -51,21 +51,44 @@ class BookService {
     int pageSize = 10,
   }) async {
     try {
-      final response = await http.get(
-        Uri.parse(
-          '${baseUrl}category/$category?pageNumber=$pageNumber&pageSize=$pageSize',
-        ),
+      // Handle "All" category by using getAllBooks
+      if (category.toLowerCase() == 'all') {
+        return getAllBooks();
+      }
+
+      // For other categories, use the category endpoint
+      final uri = Uri.parse('${baseUrl}category/$category').replace(
+        queryParameters: {
+          'pageNumber': pageNumber.toString(),
+          'pageSize': pageSize.toString(),
+        },
       );
+
+      print('Fetching books from: $uri');
+
+      final response = await http.get(uri);
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> result = json.decode(response.body);
-        final List<dynamic> data = result['items'];
-        return data.map((json) => Book.fromJson(json)).toList();
+        try {
+          final Map<String, dynamic> result = json.decode(response.body);
+          if (result.containsKey('items') && result['items'] is List) {
+            final List<dynamic> data = result['items'];
+            return data.map((json) => Book.fromJson(json)).toList();
+          } else {
+            print('Response does not contain items list: $result');
+            return [];
+          }
+        } catch (e) {
+          print('Error parsing response: $e');
+          throw Exception('Error parsing category books response: $e');
+        }
       } else {
         throw Exception(
           'Failed to load books for category $category: ${response.statusCode}',
         );
       }
     } catch (e) {
+      print('Error fetching category books: $e');
       throw Exception('Error fetching category books: $e');
     }
   }
@@ -78,6 +101,33 @@ class BookService {
       return Book.fromJson(data);
     } else {
       throw Exception('Failed to fetch book with id $id');
+    }
+  }
+
+  Future<List<Book>> filterBooks({
+    String? title,
+    String? isbn,
+    String? language,
+    String? sortBy,
+    String? sortDirection,
+  }) async {
+    final uri = Uri.parse('http://localhost:5062/api/filter').replace(
+      queryParameters: {
+        if (title != null && title.isNotEmpty) 'title': title,
+        if (isbn != null && isbn.isNotEmpty) 'isbn': isbn,
+        if (language != null && language.isNotEmpty) 'language': language,
+        if (sortBy != null) 'sortBy': sortBy,
+        if (sortDirection != null) 'sortDirection': sortDirection,
+      },
+    );
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => Book.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load books');
     }
   }
 }

@@ -3,8 +3,9 @@ import 'package:book_frontend/screens/admin/author_management_page.dart';
 import 'package:book_frontend/screens/admin/book_management_page.dart';
 import 'package:book_frontend/screens/admin/genre_management_page.dart';
 import 'package:book_frontend/screens/admin/publisher_page.dart';
+import 'package:book_frontend/screens/bookmark_page.dart';
 import 'package:book_frontend/screens/cart_item_screen.dart';
-import 'package:book_frontend/screens/catalog_page.dart';
+import 'package:book_frontend/screens/filter_books_screen.dart';
 import 'package:book_frontend/screens/staff/claim_process_page.dart';
 import 'package:book_frontend/screens/home_page.dart';
 import 'package:book_frontend/screens/login_page.dart';
@@ -28,11 +29,12 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => RegisterPage(),
-        '/catalog': (context) => const CatalogPage(),
+        '/catalog': (context) => FilteredBooksScreen(),
         '/cart': (context) => const CartPage(),
         '/books': (context) => BookManagementPage(),
         '/publishers': (context) => const PublisherPage(),
         '/genres': (context) => const GenreManagementPage(),
+        '/bookmarks': (context) => BookmarkPage(),
         '/authors': (context) => const AuthorManagementPage(),
         '/orders-list': (context) => const UserOrdersPage(),
         '/claim-process': (context) => const ClaimProcessPage(),

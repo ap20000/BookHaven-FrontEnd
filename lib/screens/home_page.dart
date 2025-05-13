@@ -1,3 +1,4 @@
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:book_frontend/api/book_service.dart';
 import 'package:book_frontend/api/announcement_service.dart';
 import 'package:book_frontend/model/announcement.dart';
@@ -65,6 +66,11 @@ class _HomePageState extends State<HomePage> {
         onCatalogPressed: () => Navigator.pushNamed(context, '/catalog'),
         onBookmarkPressed: () => Navigator.pushNamed(context, '/bookmarks'),
         onCartPressed: () => Navigator.pushNamed(context, '/cart'),
+        onLogoutPressed: () async {
+          final auth = AuthService();
+          await auth.logout();
+          Navigator.pushReplacementNamed(context, '/login');
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
