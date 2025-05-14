@@ -1,4 +1,7 @@
+import 'package:book_frontend/api/auth_service.dart';
 import 'package:book_frontend/api/book_service.dart';
+import 'package:book_frontend/api/announcement_service.dart';
+import 'package:book_frontend/model/announcement.dart';
 import 'package:book_frontend/model/book.dart';
 import 'package:book_frontend/widget/book_card_widget.dart';
 import 'package:book_frontend/widget/custom_app_bar.dart';
@@ -13,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final BookService bookService = BookService();
+  final AnnouncementService announcementService = AnnouncementService();
 
   final List<String> categories = [
     'All',
@@ -23,6 +27,10 @@ class _HomePageState extends State<HomePage> {
   String selectedCategory = 'All';
 
   late Future<List<Book>> futureBooks;
+  late Future<List<Announcement>> futureAnnouncements;
+
+  int _currentAnnouncementIndex = 0;
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -30,6 +38,13 @@ class _HomePageState extends State<HomePage> {
     futureBooks = bookService.getBooksByCategory(
       selectedCategory.toLowerCase(),
     );
+    futureAnnouncements = announcementService.getActiveAnnouncements();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   void _onCategoryChanged(String? category) {
@@ -51,6 +66,11 @@ class _HomePageState extends State<HomePage> {
         onCatalogPressed: () => Navigator.pushNamed(context, '/catalog'),
         onBookmarkPressed: () => Navigator.pushNamed(context, '/bookmarks'),
         onCartPressed: () => Navigator.pushNamed(context, '/cart'),
+        onLogoutPressed: () async {
+          final auth = AuthService();
+          await auth.logout();
+          Navigator.pushReplacementNamed(context, '/login');
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -58,6 +78,102 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
+
+            // Announcement slider
+            SizedBox(
+              height: 80,
+              child: FutureBuilder<List<Announcement>>(
+                future: futureAnnouncements,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.black),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Container(); // Hide on error
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Container(); // Hide if no announcements
+                  }
+
+                  final announcements = snapshot.data!;
+
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: announcements.length,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentAnnouncementIndex = index;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            final announcement = announcements[index];
+                            return Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.campaign, size: 24),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    announcement.title,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      announcement.message,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      if (announcements.length > 1) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            announcements.length,
+                            (index) => Container(
+                              width: 8,
+                              height: 8,
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color:
+                                    _currentAnnouncementIndex == index
+                                        ? Colors.black
+                                        : Colors.grey[300],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
