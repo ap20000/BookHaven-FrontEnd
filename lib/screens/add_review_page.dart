@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:book_frontend/api/review_service.dart'; // Add your ReviewService import
 import 'package:book_frontend/model/review.dart'; // Add your Review model import
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddReviewPage extends StatefulWidget {
   final int bookId; // Pass bookId to this page
@@ -16,6 +17,15 @@ class _AddReviewPageState extends State<AddReviewPage> {
   final TextEditingController _commentController = TextEditingController();
   int _rating = 0; // Default rating
 
+  // Fetch the username from SharedPreferences (assuming it's stored there)
+  Future<String?> _getUserID() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(
+      'userId',
+    ); // Make sure the username is stored during login
+  }
+
+  // Handle the review submission
   Future<void> _submitReview() async {
     if (_rating == 0 || _commentController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -24,10 +34,21 @@ class _AddReviewPageState extends State<AddReviewPage> {
       return;
     }
 
+    final userID = await _getUserID();
+    if (userID == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in')));
+      return;
+    }
+
     final review = Review(
-      bookId: widget.bookId,
+      reviewID: 0, // Assume reviewID is auto-generated in the backend
+      userID: userID,
       rating: _rating,
       comment: _commentController.text,
+      reviewDate: DateTime.now(),
+      bookID: widget.bookId,
     );
 
     try {
@@ -35,7 +56,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Review submitted successfully')),
       );
-      // You can optionally navigate back or reset the form
+      // Optionally navigate back or reset the form
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
